@@ -9,6 +9,7 @@ Hardened by [Chainguard](https://www.chainguard.dev) from the upstream action at
 | Version | Tag | Upstream commit |
 |---------|-----|-----------------|
 | v0.1.1 | [`v0.1.1`](https://github.com/chainguard-actions/keithweaver-aws-s3-github-action/tree/v0.1.1) | [`285315d`](https://github.com/keithweaver/aws-s3-github-action/commit/285315d2d4374683fc29e56b74a00b12879955eb) |
+| v0.1.2 | [`v0.1.2`](https://github.com/chainguard-actions/keithweaver-aws-s3-github-action/tree/v0.1.2) | [`e6b2f7d`](https://github.com/keithweaver/aws-s3-github-action/commit/e6b2f7dba9982a13f7b27fbdc0cda58c8791b430) |
 
 ## Privacy
 
