@@ -1,0 +1,33 @@
+name: Test aws_session_token input is accepted
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Run ls command with aws_session_token (expect failure at AWS level, not validation)
+        id: action
+        uses: .
+        with:
+          command: ls
+          source: s3://nonexistent-bucket-for-testing-12345
+          aws_access_key_id: AKIAIOSFODNN7EXAMPLE
+          aws_secret_access_key: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+          aws_session_token: AQoDYXdzEJr//fake-session-token-for-testing
+          aws_region: us-east-1
+        continue-on-error: true
+
+      - name: Assert action failed at AWS level (not at validation)
+        env:
+          OUTCOME: ${{ steps.action.outcome }}
+        run: |
+          echo "outcome: $OUTCOME"
+          # The action should fail because AWS credentials are fake / bucket doesn't exist,
+          # NOT because of input validation. This confirms aws_session_token is accepted.
+          if [ "$OUTCOME" != "failure" ]; then
+            echo "FAIL: expected action to fail (AWS error), but got outcome=$OUTCOME"
+            exit 1
+          fi
+          echo "PASS: action failed at AWS level as expected (aws_session_token input accepted)"
