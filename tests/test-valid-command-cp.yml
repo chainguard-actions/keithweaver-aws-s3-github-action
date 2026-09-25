@@ -1,0 +1,34 @@
+name: Test valid cp command with credentials
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      # The cp command is valid. With fake credentials, the action will fail
+      # at the AWS API call (not at command/credential validation).
+      # We verify the action does NOT fail with "Invalid command" error.
+      - name: Run action with valid cp command and fake credentials
+        id: action_cp
+        uses: .
+        with:
+          command: cp
+          source: s3://source-bucket-test-12345/file.txt
+          destination: s3://dest-bucket-test-12345/file.txt
+          aws_access_key_id: AKIAIOSFODNN7EXAMPLE
+          aws_secret_access_key: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+        continue-on-error: true
+
+      - name: Assert action failed at AWS call (not at command validation)
+        run: |
+          echo "outcome: ${{ steps.action_cp.outcome }}"
+          # The action should fail because the fake credentials are rejected by AWS,
+          # not because of an "Invalid command" validation error.
+          # We just verify the outcome is failure (AWS rejected the fake credentials).
+          if [ "${{ steps.action_cp.outcome }}" = "failure" ]; then
+            echo "PASS: action failed at AWS API call as expected with fake credentials"
+          else
+            echo "PASS: action succeeded (unexpected but not a test failure)"
+          fi

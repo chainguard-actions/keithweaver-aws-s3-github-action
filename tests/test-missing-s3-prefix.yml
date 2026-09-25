@@ -1,0 +1,27 @@
+name: Test missing s3:// prefix rejection
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - name: Run action with ls command but no s3:// prefix (expect failure)
+        id: action
+        uses: .
+        with:
+          command: ls
+          source: my-bucket/file.txt
+          aws_access_key_id: AKIAIOSFODNN7EXAMPLE
+          aws_secret_access_key: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+        continue-on-error: true
+      - name: Assert action failed due to missing s3:// prefix
+        env:
+          OUTCOME: ${{ steps.action.outcome }}
+        run: |
+          echo "outcome: $OUTCOME"
+          if [ "$OUTCOME" != "failure" ]; then
+            echo "FAIL: expected action to fail when source lacks s3:// prefix, but got outcome '$OUTCOME'"
+            exit 1
+          fi
+          echo "PASS: action correctly rejected source without s3:// prefix"
